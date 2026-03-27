@@ -8,17 +8,26 @@ export function useSubscription() {
 
 export function SubscriptionProvider({ children }) {
   // Try to load initial state from sessionStorage
+  // Try to load initial state (only user survives refresh)
   const getInitialState = () => {
-    const saved = sessionStorage.getItem('subscriptionFlow');
-    return saved ? JSON.parse(saved) : { user: null, plan: null, coupon: null };
+    const savedUser = sessionStorage.getItem('subscriptionUser');
+    return { 
+      user: savedUser ? JSON.parse(savedUser) : null, 
+      plan: null, 
+      coupon: null 
+    };
   };
 
   const [state, setState] = useState(getInitialState);
 
-  // Save state to sessionStorage whenever it changes
+  // Save only user to sessionStorage whenever it changes
   useEffect(() => {
-    sessionStorage.setItem('subscriptionFlow', JSON.stringify(state));
-  }, [state]);
+    if (state.user) {
+      sessionStorage.setItem('subscriptionUser', JSON.stringify(state.user));
+    } else {
+      sessionStorage.removeItem('subscriptionUser');
+    }
+  }, [state.user]);
 
   const setUser = (user) => setState((prev) => ({ ...prev, user }));
   const setPlan = (plan) => setState((prev) => ({ ...prev, plan }));

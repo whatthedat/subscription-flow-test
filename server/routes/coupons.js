@@ -6,9 +6,13 @@ import db from '../db.js';
  * Returns all coupons.
  */
 export function getCoupons(req, res) {
-  // TODO: Implement this function
-
-  res.status(501).json({ error: 'Not implemented' });
+  try {
+    const coupons = db.query('SELECT * FROM coupons').all();
+    res.json({ coupons });
+  } catch (error) {
+    console.error('Error fetching coupons:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 }
 
 /**
